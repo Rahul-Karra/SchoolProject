@@ -9,6 +9,10 @@ import com.nimblix.SchoolPEPProject.Model.Student;
 @Repository
 public interface StudentRepository extends JpaRepository<Student,Integer> {
 
+<<<<<<< Updated upstream
 	@Query(value = "select * from student where email=?1",nativeQuery =true)
+=======
+	@Query(value = "select * from student where email =?1",nativeQuery = true)
+>>>>>>> Stashed changes
 	Student findByEmail(String email);
 }

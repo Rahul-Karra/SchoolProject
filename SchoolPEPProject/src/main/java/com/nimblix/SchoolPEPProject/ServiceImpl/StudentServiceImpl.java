@@ -1,14 +1,27 @@
 package com.nimblix.SchoolPEPProject.ServiceImpl;
 
+<<<<<<< Updated upstream
 import com.nimblix.SchoolPEPProject.Model.Student;
 import com.nimblix.SchoolPEPProject.Repository.StudentRepository;
 import com.nimblix.SchoolPEPProject.Request.StudentLoginRequest;
 import com.nimblix.SchoolPEPProject.Request.StudentRegistrationRequest;
 import com.nimblix.SchoolPEPProject.Service.StudentService;
 import lombok.RequiredArgsConstructor;
+=======
+import java.util.List;
+
+>>>>>>> Stashed changes
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.nimblix.SchoolPEPProject.Model.Student;
+import com.nimblix.SchoolPEPProject.Repository.StudentRepository;
+import com.nimblix.SchoolPEPProject.Request.StudentLoginRequest;
+import com.nimblix.SchoolPEPProject.Request.StudentRegistrationRequest;
+import com.nimblix.SchoolPEPProject.Service.StudentService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -16,9 +29,14 @@ public class StudentServiceImpl implements StudentService {
 
       private final PasswordEncoder passwordEncoder;
       private final StudentRepository studentRepository;
+<<<<<<< Updated upstream
 
 
       @Override
+=======
+      private final PasswordDe
+    @Override
+>>>>>>> Stashed changes
     public ResponseEntity<?> registerStudent(StudentRegistrationRequest request) {
 
         // Validate password match
@@ -40,6 +58,20 @@ public class StudentServiceImpl implements StudentService {
         // Return success message
         return ResponseEntity.ok("Registration Successful");
     }
+	@Override
+	public ResponseEntity<?> loginStudent(StudentLoginRequest request) {
+		// Encode password
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        
+        
+		return null;
+	}
+	
+	public boolean isEmailExists(String email) {
+		List<Student> students = studentRepository.findAll();
+		
+		return studentRepository.exists(null)
+	}
 
 
 	@Override

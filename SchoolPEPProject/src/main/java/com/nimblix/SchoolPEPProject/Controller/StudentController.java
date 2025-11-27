@@ -1,6 +1,14 @@
 package com.nimblix.SchoolPEPProject.Controller;
 
+<<<<<<< Updated upstream
 import org.springframework.http.HttpStatus;
+=======
+import com.nimblix.SchoolPEPProject.Request.StudentLoginRequest;
+import com.nimblix.SchoolPEPProject.Request.StudentRegistrationRequest;
+import com.nimblix.SchoolPEPProject.Service.StudentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+>>>>>>> Stashed changes
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +43,10 @@ public class StudentController {
     public ResponseEntity<?> studentLogin(@RequestBody StudentLoginRequest studentLoginRequest){
     	studentService.loginStudent(studentLoginRequest);
         return  ResponseEntity.status(HttpStatus.ACCEPTED).body("Student Login Successful");
+    }
+    
+    public ResponseEntity<?> studentLogin(@RequestBody StudentLoginRequest studentLoginRequest){
+    	return studentService.loginStudent(studentLoginRequest);
     }
 
 }
