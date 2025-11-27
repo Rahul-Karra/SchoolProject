@@ -8,4 +8,5 @@ import org.springframework.stereotype.Service;
 public interface StudentService {
     ResponseEntity<?> registerStudent(StudentRegistrationRequest studentRegistrationRequest);
 
+    void getStudentListBySchoolId(Integer schoolId);
 }
