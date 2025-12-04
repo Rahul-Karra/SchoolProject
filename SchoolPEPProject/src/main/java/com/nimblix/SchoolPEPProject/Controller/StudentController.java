@@ -20,9 +20,10 @@ public class StudentController {
 
     private final StudentService studentService;
 
+
     /*
     In this API we are registering the student. It will help to onboard the student, In this we are storing the  student
-    fullname,emailId and password.
+    fullName,emailId and password.
      */
     @PostMapping("/register")
     public ResponseEntity<?> studentRegistration(@RequestBody StudentRegistrationRequest request) {
@@ -43,11 +44,11 @@ public class StudentController {
     }
 
  /*
-       This API is used to fetch the student details by using the student Id
+       This API is used to fetch the student details by using the student I'd.
  */
 
     @GetMapping("/details")
-    public ResponseEntity<?> getStudentDetailsByStudentId(@RequestParam Integer studentId) {
+    public ResponseEntity<?> getStudentDetailsByStudentId(@RequestParam Long studentId) {
 
         Map<String, Object> response = new HashMap<>();
         Student student = studentService.getStudentListByStudentId(studentId);
@@ -62,7 +63,6 @@ public class StudentController {
         response.put(SchoolConstants.STATUS, SchoolConstants.STATUS_SUCCESS);
         response.put(SchoolConstants.MESSAGE, "Student details fetched successfully");
         response.put("data", student);
-
         return ResponseEntity.ok(response);
     }
 
@@ -70,7 +70,7 @@ public class StudentController {
 
         @PostMapping("/update")
         public ResponseEntity<?> updateStudent(
-                @RequestParam Integer studentId,
+                @RequestParam Long studentId,
                 @RequestBody StudentRegistrationRequest request) {
 
             Map<String, Object> response = new HashMap<>();
@@ -91,7 +91,7 @@ public class StudentController {
 
 
         @PostMapping("/delete")
-        public ResponseEntity<?> deleteStudent(@RequestParam Integer studentId) {
+        public ResponseEntity<?> deleteStudent(@RequestParam Long studentId) {
             Map<String, Object> response = new HashMap<>();
 
             try {
@@ -111,7 +111,7 @@ public class StudentController {
 
         @PutMapping("/update")
         public ResponseEntity<?> updateStudentPut(
-                @RequestParam Integer studentId,
+                @RequestParam Long studentId,
                 @RequestBody StudentRegistrationRequest request) {
 
             Map<String, Object> response = new HashMap<>();
@@ -131,10 +131,8 @@ public class StudentController {
 
 
 
-
-
         @DeleteMapping("/delete")
-        public ResponseEntity<?> deleteStudentDelete(@RequestParam Integer studentId) {
+        public ResponseEntity<?> deleteStudentDelete(@RequestParam Long studentId) {
             Map<String, Object> response = new HashMap<>();
 
             try {

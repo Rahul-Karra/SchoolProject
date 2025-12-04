@@ -1,7 +1,11 @@
 package com.nimblix.SchoolPEPProject.ServiceImpl;
 import com.nimblix.SchoolPEPProject.Constants.SchoolConstants;
+import com.nimblix.SchoolPEPProject.Model.Role;
 import com.nimblix.SchoolPEPProject.Model.Student;
+import com.nimblix.SchoolPEPProject.Model.User;
+import com.nimblix.SchoolPEPProject.Repository.RoleRepository;
 import com.nimblix.SchoolPEPProject.Repository.StudentRepository;
+import com.nimblix.SchoolPEPProject.Repository.UserRepository;
 import com.nimblix.SchoolPEPProject.Request.StudentRegistrationRequest;
 import com.nimblix.SchoolPEPProject.Service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +19,11 @@ import org.springframework.stereotype.Service;
 public class StudentServiceImpl implements StudentService {
 
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
     private final StudentRepository studentRepository;
+    private final RoleRepository roleRepository;
 
-    public ResponseEntity<?> registerStudent(StudentRegistrationRequest request) {
-
-        // Validate password match
+    public ResponseEntity<?> registerStudent(StudentRegistrationRequest request) { // Validate password match
         if (!request.getPassword().equals(request.getReEnterPassword())) {
             return ResponseEntity.badRequest().body("Password and Re-Enter Password do not match!");
         }
@@ -27,7 +31,7 @@ public class StudentServiceImpl implements StudentService {
         // Encode password
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // Create and save student
+        // Save Student
         Student student = new Student();
         student.setFullName(request.getFullName());
         student.setEmail(request.getEmail());
@@ -37,17 +41,30 @@ public class StudentServiceImpl implements StudentService {
 
         studentRepository.save(student);
 
+        Role studentRole = roleRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        // Save User (Login table)
+        User user = new User();
+        user.setFullName(request.getFullName());
+        user.setEmailId(request.getEmail());
+        user.setPassword(encodedPassword);
+        user.setStatus(SchoolConstants.ACTIVE);
+        user.setIsLogin(false);
+        user.setRole(studentRole);
+        user.setDesignation(SchoolConstants.STUDENT);
+        userRepository.save(user);
+
         return ResponseEntity.ok("Registration Successful");
     }
 
-
     @Override
-    public Student getStudentListByStudentId(Integer studentId) {
+    public Student getStudentListByStudentId(Long studentId) {
         return studentRepository.findById(studentId).orElse(null);
     }
 
     @Override
-    public void updateStudentDetails(Integer studentId, StudentRegistrationRequest request) {
+    public void updateStudentDetails(Long studentId, StudentRegistrationRequest request) {
 
         Student existingStudent = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
@@ -77,13 +94,24 @@ public class StudentServiceImpl implements StudentService {
         studentRepository.save(existingStudent);
     }
 
+//
+//    @Override
+//    public void deleteStudent(Integer studentId) {
+//
+//        Student student = studentRepository.findById(studentId)
+//                .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
+//
+//        studentRepository.delete(student);
+//    }
+
 
     @Override
-    public void deleteStudent(Integer studentId) {
+    public void deleteStudent(Long studentId) {
 
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
+        student.setStatus(SchoolConstants.IN_ACTIVE);
 
-        studentRepository.delete(student);
+        studentRepository.save(student);
     }
 }

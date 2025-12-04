@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 public interface StudentService {
     ResponseEntity<?> registerStudent(StudentRegistrationRequest studentRegistrationRequest);
 
-    Student getStudentListByStudentId(Integer studentId);
+    Student getStudentListByStudentId(Long studentId);
 
-    void deleteStudent(Integer studentId);
+    void deleteStudent(Long studentId);
 
-    void updateStudentDetails(Integer studentId, StudentRegistrationRequest request);
+    void updateStudentDetails(Long studentId, StudentRegistrationRequest request);
 
 //    void updateStudentDetails(Integer studentId, StudentRegistrationRequest request);
 }

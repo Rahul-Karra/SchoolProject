@@ -6,29 +6,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "subjects")
+@Table(name = "Attachment")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Subjects {
-
-
+public class Attachments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String fileName;
+    private String fileUrl;
 
-    private String code;
-
-    private String description;
-
-    @Column(name = "teacher_id")
-    private Long teacher;
-
-    @Column(name = "class_id")
-    private Long schoolClass;
-
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    private Task task;
 
 }

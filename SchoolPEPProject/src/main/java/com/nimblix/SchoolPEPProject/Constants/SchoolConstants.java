@@ -1,6 +1,7 @@
 package com.nimblix.SchoolPEPProject.Constants;
 
 public class SchoolConstants {
+    public static String IN_ACTIVE ="inActive" ;
     public static String STATUS_SUCCESS ="SUCCESS" ;
     public static String STUDENT ="STUDENT" ;
     public static String STUDENT_NOT_FOUND ="Student not found" ;

@@ -35,7 +35,7 @@ public class AuthController {
 
             // Fetch from DB
             User user = userRepository
-                    .findByEmailIdIgnoreCaseOrMobile(request.getEmail(), request.getEmail())
+                    .findByEmailId(request.getEmail())
                     .filter(u -> u.getStatus().equalsIgnoreCase(SchoolConstants.ACTIVE))
                     .orElse(null);
 
