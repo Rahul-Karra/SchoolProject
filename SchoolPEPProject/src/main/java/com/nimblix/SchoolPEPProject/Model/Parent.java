@@ -1,6 +1,7 @@
 package com.nimblix.SchoolPEPProject.Model;
 
 
+import com.nimblix.SchoolPEPProject.Enum.ParentRole;
 import com.nimblix.SchoolPEPProject.Util.SchoolUtil;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
