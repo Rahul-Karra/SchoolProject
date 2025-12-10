@@ -1,4 +1,4 @@
-package com.nimblix.SchoolPEPProject.Model;
+package com.nimblix.SchoolPEPProject.Enum;
 
 public enum TeachingDesignation {
     TEACHER,
