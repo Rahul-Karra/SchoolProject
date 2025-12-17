@@ -4,6 +4,10 @@ import com.nimblix.SchoolPEPProject.Constants.SchoolConstants;
 import com.nimblix.SchoolPEPProject.Model.Student;
 import com.nimblix.SchoolPEPProject.Request.StudentRegistrationRequest;
 import com.nimblix.SchoolPEPProject.Service.StudentService;
+import com.nimblix.SchoolPEPProject.Response.StudentProfileResponse;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +26,7 @@ public class StudentController {
 
     /*
     In this API we are registering the student. It will help to onboard the student, In this we are storing the  student
-    fullname,emailId and password.
+    fullName,emailId and password.
      */
     @PostMapping("/register")
     public ResponseEntity<?> studentRegistration(@RequestBody StudentRegistrationRequest request) {
@@ -43,11 +47,11 @@ public class StudentController {
     }
 
  /*
-       This API is used to fetch the student details by using the student Id
+       This API is used to fetch the student details by using the student I'd.
  */
 
     @GetMapping("/details")
-    public ResponseEntity<?> getStudentDetailsByStudentId(@RequestParam Integer studentId) {
+    public ResponseEntity<?> getStudentDetailsByStudentId(@RequestParam Long studentId) {
 
         Map<String, Object> response = new HashMap<>();
         Student student = studentService.getStudentListByStudentId(studentId);
@@ -62,7 +66,6 @@ public class StudentController {
         response.put(SchoolConstants.STATUS, SchoolConstants.STATUS_SUCCESS);
         response.put(SchoolConstants.MESSAGE, "Student details fetched successfully");
         response.put("data", student);
-
         return ResponseEntity.ok(response);
     }
 
@@ -70,7 +73,7 @@ public class StudentController {
 
         @PostMapping("/update")
         public ResponseEntity<?> updateStudent(
-                @RequestParam Integer studentId,
+                @RequestParam Long studentId,
                 @RequestBody StudentRegistrationRequest request) {
 
             Map<String, Object> response = new HashMap<>();
@@ -91,7 +94,7 @@ public class StudentController {
 
 
         @PostMapping("/delete")
-        public ResponseEntity<?> deleteStudent(@RequestParam Integer studentId) {
+        public ResponseEntity<?> deleteStudent(@RequestParam Long studentId) {
             Map<String, Object> response = new HashMap<>();
 
             try {
@@ -111,7 +114,7 @@ public class StudentController {
 
         @PutMapping("/update")
         public ResponseEntity<?> updateStudentPut(
-                @RequestParam Integer studentId,
+                @RequestParam Long studentId,
                 @RequestBody StudentRegistrationRequest request) {
 
             Map<String, Object> response = new HashMap<>();
@@ -131,10 +134,8 @@ public class StudentController {
 
 
 
-
-
         @DeleteMapping("/delete")
-        public ResponseEntity<?> deleteStudentDelete(@RequestParam Integer studentId) {
+        public ResponseEntity<?> deleteStudentDelete(@RequestParam Long studentId) {
             Map<String, Object> response = new HashMap<>();
 
             try {
@@ -149,6 +150,37 @@ public class StudentController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
         }
+    // Code to get student profile
+    @GetMapping("/profile/{studentId}")
+    public ResponseEntity<Map<String, Object>> getStudentProfile(@PathVariable Long studentId) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null || !authentication.isAuthenticated()) {
+                response.put(SchoolConstants.STATUS, SchoolConstants.STATUS_FAILURE);
+                response.put(SchoolConstants.MESSAGE, "Unauthorized: JWT token missing or invalid.");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+
+            String viewerEmail = authentication.getName();
+
+            StudentProfileResponse profile = studentService.getStudentProfile(studentId, viewerEmail);
+
+            response.put(SchoolConstants.STATUS, SchoolConstants.STATUS_SUCCESS);
+            response.put(SchoolConstants.MESSAGE, "Student profile fetched successfully");
+            response.put("data", profile);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put(SchoolConstants.STATUS, SchoolConstants.STATUS_FAILURE);
+            response.put(SchoolConstants.MESSAGE, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
+
+}
 
 

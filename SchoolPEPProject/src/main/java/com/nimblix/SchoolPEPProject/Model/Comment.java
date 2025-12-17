@@ -1,40 +1,30 @@
 package com.nimblix.SchoolPEPProject.Model;
 
-
-
 import com.nimblix.SchoolPEPProject.Util.SchoolUtil;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
     @Entity
-    @Table(name = "teachers")
+    @Table(name = "Comment")
     @Getter
     @Setter
     @NoArgsConstructor
-    public class Teacher {
-
+    public class Comment {
 
 
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
 
-        @Column(name = "full_name")
-        private String fullName;
 
-        @Column(name = "school_id")
-        private Long schoolId;
+        @Column(name = "message")
+        private String message;
 
-        @Column(name = "email_id")
-        private String emailId;
-
-        @OneToMany(mappedBy = "teacher")
-        private List<Subjects> subjects = new ArrayList<>();
+        @ManyToOne
+        @JoinColumn(name = "task_id")
+        private Task task;
 
         @Column(name = "created_time")
         private String createdTime;
@@ -57,4 +47,4 @@ import java.util.List;
 
         }
 
-    }
+}

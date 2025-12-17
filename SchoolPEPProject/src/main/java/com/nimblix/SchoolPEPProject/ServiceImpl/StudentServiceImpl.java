@@ -1,13 +1,25 @@
 package com.nimblix.SchoolPEPProject.ServiceImpl;
+
+import com.nimblix.SchoolPEPProject.Constants.Roles;
 import com.nimblix.SchoolPEPProject.Constants.SchoolConstants;
+import com.nimblix.SchoolPEPProject.Model.Parent;
+import com.nimblix.SchoolPEPProject.Model.Role;
 import com.nimblix.SchoolPEPProject.Model.Student;
+import com.nimblix.SchoolPEPProject.Model.User;
+import com.nimblix.SchoolPEPProject.Repository.ParentRepository;
+import com.nimblix.SchoolPEPProject.Repository.RoleRepository;
 import com.nimblix.SchoolPEPProject.Repository.StudentRepository;
+import com.nimblix.SchoolPEPProject.Repository.UserRepository;
 import com.nimblix.SchoolPEPProject.Request.StudentRegistrationRequest;
+import com.nimblix.SchoolPEPProject.Response.StudentProfileResponse;
 import com.nimblix.SchoolPEPProject.Service.StudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
 
 
 @Service
@@ -15,11 +27,12 @@ import org.springframework.stereotype.Service;
 public class StudentServiceImpl implements StudentService {
 
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
     private final StudentRepository studentRepository;
+    private final RoleRepository roleRepository;
+    private final ParentRepository parentRepository;
 
-    public ResponseEntity<?> registerStudent(StudentRegistrationRequest request) {
-
-        // Validate password match
+    public ResponseEntity<?> registerStudent(StudentRegistrationRequest request) { // Validate password match
         if (!request.getPassword().equals(request.getReEnterPassword())) {
             return ResponseEntity.badRequest().body("Password and Re-Enter Password do not match!");
         }
@@ -27,7 +40,7 @@ public class StudentServiceImpl implements StudentService {
         // Encode password
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // Create and save student
+        // Save Student
         Student student = new Student();
         student.setFullName(request.getFullName());
         student.setEmail(request.getEmail());
@@ -37,17 +50,30 @@ public class StudentServiceImpl implements StudentService {
 
         studentRepository.save(student);
 
+        Role studentRole = roleRepository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        // Save User (Login table)
+        User user = new User();
+        user.setFullName(request.getFullName());
+        user.setEmailId(request.getEmail());
+        user.setPassword(encodedPassword);
+        user.setStatus(SchoolConstants.ACTIVE);
+        user.setIsLogin(false);
+        user.setRole(studentRole);
+        user.setDesignation(SchoolConstants.STUDENT);
+        userRepository.save(user);
+
         return ResponseEntity.ok("Registration Successful");
     }
 
-
     @Override
-    public Student getStudentListByStudentId(Integer studentId) {
+    public Student getStudentListByStudentId(Long studentId) {
         return studentRepository.findById(studentId).orElse(null);
     }
 
     @Override
-    public void updateStudentDetails(Integer studentId, StudentRegistrationRequest request) {
+    public void updateStudentDetails(Long studentId, StudentRegistrationRequest request) {
 
         Student existingStudent = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
@@ -77,13 +103,91 @@ public class StudentServiceImpl implements StudentService {
         studentRepository.save(existingStudent);
     }
 
+//
+//    @Override
+//    public void deleteStudent(Integer studentId) {
+//
+//        Student student = studentRepository.findById(studentId)
+//                .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
+//
+//        studentRepository.delete(student);
+//    }
+
 
     @Override
-    public void deleteStudent(Integer studentId) {
+    public void deleteStudent(Long studentId) {
 
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
+        student.setStatus(SchoolConstants.IN_ACTIVE);
 
-        studentRepository.delete(student);
+        studentRepository.save(student);
+    }
+    @Override
+    public StudentProfileResponse getStudentProfile(Long studentId, String viewerEmail) {
+
+        User viewer = userRepository.findByEmailId(viewerEmail)
+                .orElseThrow(() -> new RuntimeException(SchoolConstants.USER_NOT_FOUND + viewerEmail));
+
+        String roleName = viewer.getRole().getRoleName();
+
+        if (roleName.equalsIgnoreCase(Roles.STUDENT.name())
+                || roleName.equalsIgnoreCase(Roles.PARENTS.name())) {
+            throw new RuntimeException("Access Denied: Only teaching and non-teaching staff can view student profiles.");
+        }
+
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new RuntimeException(SchoolConstants.STUDENT_NOT_FOUND));
+
+
+        Optional<Parent> parentOpt = parentRepository.findByStudent(student);
+        Parent parent = parentOpt.orElse(null);
+
+        if (parent != null
+                && parent.getSchoolId() != null
+                && student.getSchoolId() != null
+                && !parent.getSchoolId().equals(student.getSchoolId())) {
+
+            throw new RuntimeException("Access Denied: Student and Parent belong to different schools.");
+        }
+
+        //enforcing viewer's schoolId by adding it to User.
+        StudentProfileResponse.StudentData studentData =
+                new StudentProfileResponse.StudentData(
+                        student.getId(),
+                        student.getFullName(),
+                        student.getEmail(),
+                        student.getClassId(),
+                        student.getSection(),
+                        student.getStatus(),
+                        student.getCreatedTime(),
+                        student.getSchoolId()
+                );
+
+        StudentProfileResponse.ParentData parentData = null;
+        if (parent != null) {
+            parentData = new StudentProfileResponse.ParentData(
+                    parent.getParentId(),
+                    parent.getFullName(),
+                    parent.getEmailId(),
+                    parent.getContactNumber(),
+                    parent.getAddress(),
+                    parent.getRole() != null ? parent.getRole().name() : null
+            );
+        }
+
+        StudentProfileResponse.ViewedByData viewedByData =
+                new StudentProfileResponse.ViewedByData(
+                        viewer.getFullName(),
+                        viewer.getDesignation(),
+                        viewer.getRole().getRoleName()
+                );
+
+        StudentProfileResponse response = new StudentProfileResponse();
+        response.setStudent(studentData);
+        response.setParent(parentData);
+        response.setViewedBy(viewedByData);
+
+        return response;
     }
 }

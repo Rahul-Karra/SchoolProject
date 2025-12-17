@@ -13,7 +13,7 @@ import lombok.*;
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(name = "full_name")
     private String fullName;
@@ -21,11 +21,17 @@ public class Student {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "class_id")
+    private Long classId;
+
+    @Column(name = "section")
+    private String section;
+
     @Column(name = "password")
     private String password;
 
     @Column(name = "schoolId")
-    private Integer schoolId;
+    private Long schoolId;
 
     @Column(name = "status")
     private String status;

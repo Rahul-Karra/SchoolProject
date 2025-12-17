@@ -1,53 +1,31 @@
 package com.nimblix.SchoolPEPProject.Model;
 
-
-import com.nimblix.SchoolPEPProject.Enum.ParentRole;
 import com.nimblix.SchoolPEPProject.Util.SchoolUtil;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Table(name = "Attachment")
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-public class Parent {
-
-
-
-
+public class Attachments {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long parentId;
+    private Long id;
 
-    @Column(name = "full_name")
-    private String fullName;
+    @Column(name = "file_name")
+    private String fileName;
 
-    @Column(name="email_id" ,unique = true)
-    private String emailId;
+    @Column(name = "file_url")
+    private String fileUrl;
 
-
-    @Column(name = "contactNumber")
-    private String contactNumber;
-
-    @Column(name="address")
-    private String address;
-
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "school_id")
-    private Long schoolId;
-
-    @Column(name = "parentRole")
-    @Enumerated(EnumType.STRING)
-    private ParentRole role;
-
-    @OneToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    private Task task;
 
     @Column(name = "created_time")
     private String createdTime;
@@ -69,6 +47,5 @@ public class Parent {
 
 
     }
-
 
 }
