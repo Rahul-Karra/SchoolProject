@@ -26,7 +26,6 @@ public class StudentProfileResponse {
         private String createdTime;
         private Long schoolId;
     }
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
