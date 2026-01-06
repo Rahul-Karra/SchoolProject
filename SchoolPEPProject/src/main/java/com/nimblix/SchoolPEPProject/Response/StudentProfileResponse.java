@@ -37,7 +37,6 @@ public class StudentProfileResponse {
         private String address;
         private String role;
     }
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
